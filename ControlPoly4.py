@@ -43,7 +43,7 @@ class ControlPoly4():
 			tipsDialog("Silk: ControlPoly4", moreInfo)
 			return		
 		if len(sel)==1:
-			if sel[0].GeometryCount==3:
+			if sel[0].TypeId == 'Sketcher::SketchObject' and sel[0].GeometryCount==3:
 				mode='3L'
 			else: #if sel[0].GeometryCount==1 or sel[0].GeometryCount==8:
 				mode='FirstElement'

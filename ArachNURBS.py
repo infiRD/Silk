@@ -48,14 +48,14 @@ print ("importing ArachNURBS")
 
 ####
 #### SECTION 1: DIRECT FUNCTIONS - NO PARAMETRIC LINKING BETWEEN OBJECTS
-#### SECTION 2: PYTHON FEATURE CLASSES - PARAMETRIC LINKING BETWEEN OBJECTS (start around line 364)
+#### SECTION 2: PYTHON FEATURE CLASSES - PARAMETRIC LINKING BETWEEN OBJECTS (start around line 1358)
 ####
 
 ### SECTION 1: DIRECT FUNCTIONS - NO PARAMETRIC LINKING BETWEEN OBJECTS
 ## Bottom up view:
 ## poles = 3D points with weights, as [[x,y,z],w], or [x,y,z] (these are leftovers waiting to receive weights).
 ## These are the basic input data for all that follows.
-## They are obtained from the FreeCAD functions .getPoles() and .getWeights()
+## They can be obtained from exisiting NURBS objects with the FreeCAD functions .getPoles() and .getWeights()
 ## NOTE: Poles in FreeCAD, such as returned by .getPoles(), refer only to xyz coordinates of a control point,
 ## THROUGHOUT the following functions, pole means [[x,y,z],w]
 ## lists are probably not efficient, but until FreeCAD has fully integrated homogeneous coordinates
@@ -101,9 +101,12 @@ def polyFromLineSet(lines, tol): # build a control polygon from a list of line s
 		a = lines[l_i][0]
 		b = lines[l_i][1]
 		# are this line's points already in the point list?
+
+		# initialize search result variables
 		a_in = False
 		b_in = False
 
+		# if a and/or b are found, increase mulptiplicity counter/s
 		for p_i in range(0, points.__len__()):
 			if equalVectors(a, points[p_i], tol):
 				a_in = True
@@ -118,6 +121,7 @@ def polyFromLineSet(lines, tol): # build a control polygon from a list of line s
 				b_i = p_i
 				#break
 
+		# if a and/or b was not found, add it/them
 		if a_in == False:
 			points.append(a)
 			mults.append(1)
@@ -128,6 +132,7 @@ def polyFromLineSet(lines, tol): # build a control polygon from a list of line s
 			mults.append(1)
 			b_i = points.__len__()-1
 
+		# add the line, by indexed references to start and end points
 		lines_indexed.append([a_i, b_i])
 
 	# print("lines \n", lines)
@@ -135,7 +140,7 @@ def polyFromLineSet(lines, tol): # build a control polygon from a list of line s
 	# print("mults \n", mults)
 	# print("lines_indexed \n", lines_indexed)
 
-	# check mult for 2s, and max of two 1s
+	# check mult for 2s, and max of two 1s - a loose user supplied tolerance can screw things up here.
 	ones = mults.count(1)
 	# print("ones, ", ones)
 	twos = mults.count(2)	
@@ -480,7 +485,7 @@ def NURBS_Cubic_64_surf(grid_64):	# given a 6 x 4 control grid, build the cubic
 
 def isWeightVectorRational(weights, tol):
 	isItTho = True
-	# compare weights 1, 2, 3, 4 to weight 0
+	# compare weights 1, 2, 3, to weight 0
 	if ((abs(weights[1]-weights[0] / weights[0]) < tol) and 
      	(abs(weights[2]-weights[0] / weights[0]) < tol) and 
 		(abs(weights[3]-weights[0] / weights[0]) < tol)):
@@ -520,42 +525,7 @@ def blend_poly_2x4_1x6(poles_0,weights_0, poles_1, weights_1, scale_0, scale_1, 
 	#print ("weights_6_1 in blend_poly_2x4_1x6")
 	#print (weights_6_1)
 
-	''' #bad legacy weight collapse mitigation
-	# check original weights....set == at 1%? 
-	# this code is behaving very strangely.
-	# it failed to reset on a strict comparison (< .001), but resets correctly on a loose comparison.
-	# the numbers under comparison were equal to 8 or more decimals???
-
-	if (((weights_0[0]-weights_0[1] / weights_0[0]).__pow__(2) < .1) and 
-     	((weights_0[0]-weights_0[2] / weights_0[0]).__pow__(2) < .1) and 
-		((weights_0[0]-weights_0[3] / weights_0[0]).__pow__(2) < .1)):
-		a = weights_0[0]
-		#print ("a ", a)
-		weights_6_0 = [a,a,a,a,a,a]
-		print("resetting weights_0")
-
-	if (((weights_1[0]-weights_1[1] / weights_1[0]).__pow__(2) < .1) and 
-     	((weights_1[0]-weights_1[2] / weights_1[0]).__pow__(2) <  .1) and 
-		((weights_1[0]-weights_1[3] / weights_1[0]).__pow__(2) <  .1)):
-		b = weights_1[0]
-		#print ("b ", b)
-		weights_6_1 = [b,b,b,b,b,b]
-		print("resetting weights_1")
-	'''
-
-	# i've been comparing various input weights against themselves...for 10 years?
-	# i'm supposed to compare output weights against input weights!
-
-	# this is important inside the grid...but absolutely critical along grid edges, or we lose G0 to the input grids
-	# (this function is applied row by row to grids)
-
-	# apparently, for each input curve, i'm comparing the 0th weight to the 1st, 2nd, and third...
-	# all this does is determine if that curve is rational. it says nothing about the output curve...
-	# because it doesn't even LOOK at the output curve weights.
-
-	# so fragements of the original test are interesting, they can help determine if the input is rational
-	# then I should do the same check on the output...
-	# but if the output is collapsed....?
+	
 	# all i can really do with 100% clarity is match the starting (or end) weight so the outer blend edges match the
 	# input curve. the true inner weights, if FreeCAD won't provide...would have to be found by performing the knot 
 	# insertion myself (partial ref here; https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/NURBS/NURBS-knot-insert.html)
@@ -572,7 +542,6 @@ def blend_poly_2x4_1x6(poles_0,weights_0, poles_1, weights_1, scale_0, scale_1, 
 	# resetting all these weights to 1 keeps G0 by luck, as edge weights were 1
 	# it still loses tangency to the underlying arc though, as the first inner points lose rationality to the edge
 
-	# first, let's stop resetting weights arbitrarily!
 	ratioTol = .000000000001
 	weights_0_ratio = isWeightVectorRational(weights_0, ratioTol)
 	weights_1_ratio = isWeightVectorRational(weights_1, ratioTol)
