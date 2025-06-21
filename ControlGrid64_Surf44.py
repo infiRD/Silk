@@ -24,11 +24,11 @@ from FreeCAD import Base
 from FreeCAD import Gui
 import ArachNURBS as AN
 from popup import tipsDialog
-import tooltips
+import Silk_tooltips
 
 # get strings
-tooltip = "work in progress" #(tooltips.ControlGrid64_Surf44_baseTip + tooltips.standardTipFooter)
-moreInfo = "work in progress" #(tooltips.ControlGrid64_Surf44_baseTip + tooltips.ControlGrid64_Surf44_moreInfo)
+tooltip = "work in progress" #(Silk_tooltips.ControlGrid64_Surf44_baseTip + Silk_tooltips.standardTipFooter)
+moreInfo = "work in progress" #(Silk_tooltips.ControlGrid64_Surf44_baseTip + Silk_tooltips.ControlGrid64_Surf44_moreInfo)
 
 # Locate Workbench Directory
 import os, Silk_dummy

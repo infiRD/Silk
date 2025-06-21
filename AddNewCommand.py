@@ -22,11 +22,11 @@ from FreeCAD import Base
 from FreeCAD import Gui
 import ArachNURBS as AN
 from popup import tipsDialog
-import tooltips
+import Silk_tooltips
 
 # get strings
-tooltip = (tooltips.AddNewCommand_baseTip + tooltips.standardTipFooter)
-moreInfo = (tooltips.AddNewCommand_baseTip + tooltips.AddNewCommand_moreInfo)
+tooltip = (Silk_tooltips.AddNewCommand_baseTip + Silk_tooltips.standardTipFooter)
+moreInfo = (Silk_tooltips.AddNewCommand_baseTip + Silk_tooltips.AddNewCommand_moreInfo)
 
 # Locate Workbench Directory & icon
 import os, Silk_dummy

@@ -23,11 +23,11 @@ from FreeCAD import Base
 from FreeCAD import Gui
 import ArachNURBS as AN
 from popup import tipsDialog
-import tooltips
+import Silk_tooltips
 
 # get strings
-tooltip = (tooltips.ControlGrid44_EdgeSegment_baseTip + tooltips.standardTipFooter)
-moreInfo = (tooltips.ControlGrid44_EdgeSegment_baseTip + tooltips.ControlGrid44_EdgeSegment_moreInfo)
+tooltip = (Silk_tooltips.ControlGrid44_EdgeSegment_baseTip + Silk_tooltips.standardTipFooter)
+moreInfo = (Silk_tooltips.ControlGrid44_EdgeSegment_baseTip + Silk_tooltips.ControlGrid44_EdgeSegment_moreInfo)
 
 # Locate Workbench Directory
 import os, Silk_dummy
