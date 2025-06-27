@@ -74,6 +74,18 @@ def equalVectors(vector0,vector1,tol):	# 3D point equality test
 	elif (vector1-vector0).Length > tol:
 		return 0
 
+def VectorIndex(list, vector):
+	listSize = list.__len__()
+	result = 'noIndex'
+	for i in range(0,listSize):
+		if equalVectors(list[i],vector,default_tol):
+			result =  i
+	if result == 'noIndex':
+			print('VectorIndex: no match found at default tolerance (.000001)')
+	return result 
+	
+
+
 def polyFromLineSet(lines, tol): # build a control polygon from a list of line segments
 	# input parameter 'lines' format = 
 	# [[startpoint0, endpoint0], [startpoint1, endpoint1],[startpoint2, endpoint2],...]
@@ -2220,18 +2232,24 @@ class ControlPoly4_FirstElement:	# made from the first element of a single sketc
 	def execute(self, fp):
 		'''Do something when doing a recomputation, this method is mandatory'''
 		# process the sketch...error check later
-		ElemNurbs=fp.Sketch.Shape.Edges[0].toNurbs().Edge1.Curve
+		# line below getting first element from shape worked for 10 years, but became unreliable in FreeCAD 1.x
+		# ElemNurbs=fp.Sketch.Shape.Edges[-1].toNurbs().Edge1.Curve
+		# now trying to work with "Geometry" attribute of sketch, hoping that the element display in sketch editor 
+		# matches the object ordering
+		ElemNurbs=fp.Sketch.Geometry[0].toNurbs()
 		ElemNurbs.increaseDegree(3)
-		p0=ElemNurbs.getPole(1)
-		p1=ElemNurbs.getPole(2)
-		p2=ElemNurbs.getPole(3)
-		p3=ElemNurbs.getPole(4)
-		# already to world?
-		#mat=fp.Sketch.Placement.toMatrix()
-		#p0=mat.multiply(p0s)
-		#p1=mat.multiply(p1s)
-		#p2=mat.multiply(p2s)
-		#p3=mat.multiply(p3s)
+		p0s=ElemNurbs.getPole(1)
+		p1s=ElemNurbs.getPole(2)
+		p2s=ElemNurbs.getPole(3)
+		p3s=ElemNurbs.getPole(4)
+		# the "Sketch.Geometry" version loses world placement
+		# "Sketch.Shape" was already to world?
+		# reactivate section below (remove 's' from prev section vars to re-deactivate)
+		mat=fp.Sketch.Placement.toMatrix()
+		p0=mat.multiply(p0s)
+		p1=mat.multiply(p1s)
+		p2=mat.multiply(p2s)
+		p3=mat.multiply(p3s)
 
 		if fp.reverse == False:
 			fp.Poles = [p0, p1, p2, p3]
