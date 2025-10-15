@@ -1,0 +1,12 @@
+[tool.ruff]
+line-length = 180
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"] # Enable Error, Flake8, Warnings, and Isort
+ignore = ["I001"] 
+  # I001 - Import block is un-sorted or un-formatted
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
