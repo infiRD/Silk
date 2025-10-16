@@ -1,4 +1,11 @@
 [flake8]
 max-line-length = 180
-ignore = E266
+ignore = E731, E704, E302, W503, E402, E266
+  # E731 - Do not assign a lambda expression, use a def
+  # E704 - Multiple statements on one line
+  # E302 - Expected 2 blank lines, found 0
+  # W503 - Line break before binary operator (this is deprecated due to W504 which
+  #        recommends break before binary operator)
+  # E402 - reorganizing the imports
+  # E241 - Multiple spaces after ':'
   # E266 - Too many leading '#' for block comment

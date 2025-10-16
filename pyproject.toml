@@ -3,10 +3,13 @@ line-length = 180
 target-version = "py39"
 
 [tool.ruff.lint]
+ignore = ["I001", "E241", "E731", "E402"]
+# I001 - Import block is un-sorted or un-formatted
+# E241 - Multiple spaces after ':'
+# E731 - Do not assign a lambda expression, use a def - will disable autocorrect of lambda function to def
+# E402 - Module level import not at top of file
 select = ["E", "F", "W", "I"] # Enable Error, Flake8, Warnings, and Isort
-ignore = ["I001"] 
-  # I001 - Import block is un-sorted or un-formatted
 
 [tool.ruff.format]
-quote-style = "double"
 indent-style = "space"
+quote-style = "double"
