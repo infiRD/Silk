@@ -22,12 +22,13 @@
 #
 
 from __future__ import division  # allows floating point division from integers
-import Part
-import FreeCAD
-from FreeCAD import Base
-from FreeCAD import Gui
+
 import math
+
+import FreeCAD
 import numpy as np
+import Part
+from FreeCAD import Base, Gui
 
 # test message to verify load and reloads
 print("importing ArachNURBS")
@@ -1735,20 +1736,32 @@ class ControlPoly4_3L:  # made from a single sketch containing 3 line objects co
     def execute(self, fp):
         """Do something when doing a recomputation, this method is mandatory"""
         # get all points on first three lines...error check later
-        p00s = fp.Sketch.Geometry[0].StartPoint
-        p01s = fp.Sketch.Geometry[0].EndPoint
-        p10s = fp.Sketch.Geometry[1].StartPoint
-        p11s = fp.Sketch.Geometry[1].EndPoint
-        p20s = fp.Sketch.Geometry[2].StartPoint
-        p21s = fp.Sketch.Geometry[2].EndPoint
-        # to world
-        mat = fp.Sketch.Placement.toMatrix()
-        p00 = mat.multiply(p00s)
-        p01 = mat.multiply(p01s)
-        p10 = mat.multiply(p10s)
-        p11 = mat.multiply(p11s)
-        p20 = mat.multiply(p20s)
-        p21 = mat.multiply(p21s)
+
+        # # original method (pre 10/2025):
+        # p00s = fp.Sketch.Geometry[0].StartPoint
+        # p01s = fp.Sketch.Geometry[0].EndPoint
+        # p10s = fp.Sketch.Geometry[1].StartPoint
+        # p11s = fp.Sketch.Geometry[1].EndPoint
+        # p20s = fp.Sketch.Geometry[2].StartPoint
+        # p21s = fp.Sketch.Geometry[2].EndPoint
+        # # apply transform -> to world
+        # mat = fp.Sketch.Placement.toMatrix()
+        # p00 = mat.multiply(p00s)
+        # p01 = mat.multiply(p01s)
+        # p10 = mat.multiply(p10s)
+        # p11 = mat.multiply(p11s)
+        # p20 = mat.multiply(p20s)
+        # p21 = mat.multiply(p21s)
+
+        # new approach (post 10/2025):
+        # - use .Shape.Edges[0].Vertexes[0].Point instead of .Geometry[0].StartPoint to allow
+        #   other objects that are not sketches (clones, shape binders, raw wires ..)
+        p00 = fp.Sketch.Shape.Edges[0].Vertexes[0].Point
+        p01 = fp.Sketch.Shape.Edges[0].Vertexes[1].Point
+        p10 = fp.Sketch.Shape.Edges[1].Vertexes[0].Point
+        p11 = fp.Sketch.Shape.Edges[1].Vertexes[1].Point
+        p20 = fp.Sketch.Shape.Edges[2].Vertexes[0].Point
+        p21 = fp.Sketch.Shape.Edges[2].Vertexes[1].Point
 
         lineset = [[p00, p01], [p10, p11], [p20, p21]]
         poles = polyFromLineSet(lineset, fp.tolerance)

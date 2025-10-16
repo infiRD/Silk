@@ -17,21 +17,25 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division  # allows floating point division from integers
-import FreeCAD, Part, math
-from FreeCAD import Base
-from FreeCAD import Gui
-import ArachNURBS as AN
-from popup import tipsDialog
-import Silk_tooltips
+# spellchecker: ignore Arach NURBS pixmap
 
+from __future__ import division  # allows floating point division from integers
+
+import FreeCAD as App
+import FreeCADGui as Gui
+
+import ArachNURBS as AN
+import Silk_tooltips
+from popup import tipsDialog
 
 # get strings
 tooltip = Silk_tooltips.ControlPoly4_baseTip + Silk_tooltips.standardTipFooter
 moreInfo = Silk_tooltips.ControlPoly4_baseTip + Silk_tooltips.ControlPoly4_moreInfo
 
 # Locate Workbench Directory & icon
-import os, Silk_dummy
+import os
+
+import Silk_dummy
 
 path_Silk = os.path.dirname(Silk_dummy.__file__)
 path_Silk_icons = os.path.join(path_Silk, "Resources", "Icons")
@@ -51,13 +55,18 @@ class ControlPoly4:
 
         elif len(sel) == 1:
             # one object selected for input
-            if sel[0].Object.TypeId == "Sketcher::SketchObject":
-                # which is a sketch
-                if sel[0].Object.GeometryCount == 3:
-                    # which contains exactly 3 geometry elements - let's assume they are lines -
+            if sel[0].Object.TypeId in [
+                "Sketcher::SketchObject",
+                "PartDesign::ShapeBinder",
+                "PartDesign::SubShapeBinder",
+                "Part::Part2DObjectPython",
+                "Part::Compound",
+            ]:
+                if len(sel[0].Object.Shape.Edges) == 3:
+                    # which contains exactly 3 edges
                     mode = "3L"
-                else:  # if sel[0].GeometryCount==1 or sel[0].GeometryCount==8:
-                    # any other number of geometry elements will only consider the first element (in the geometry listing)
+                else:
+                    # any other number of edges will only consider the first element (in the geometry listing)
                     mode = "FirstElement"
             else:
                 # is it a ControlGrid44_4?
@@ -134,68 +143,48 @@ class ControlPoly4:
 
         print("ControlPoly4 input selection interpreted as ", mode)
 
+        cp4 = None
         if mode == "3L":
             sketch = Gui.Selection.getSelection()[0]
-            a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_3L_000")
-            AN.ControlPoly4_3L(a, sketch)
-            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
-            a.ViewObject.LineWidth = 1.00
-            a.ViewObject.LineColor = (0.00, 1.00, 1.00)
-            a.ViewObject.PointSize = 4.00
-            a.ViewObject.PointColor = (0.00, 0.00, 1.00)
-            FreeCAD.ActiveDocument.recompute()
+            cp4 = App.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_3L_000")
+            AN.ControlPoly4_3L(cp4, sketch)
 
         elif mode == "FirstElement":
             sketch = Gui.Selection.getSelection()[0]
-            a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_FirstElement_000")
-            AN.ControlPoly4_FirstElement(a, sketch)
-            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
-            a.ViewObject.LineWidth = 1.00
-            a.ViewObject.LineColor = (0.00, 1.00, 1.00)
-            a.ViewObject.PointSize = 4.00
-            a.ViewObject.PointColor = (0.00, 0.00, 1.00)
-            FreeCAD.ActiveDocument.recompute()
+            cp4 = App.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_FirstElement_000")
+            AN.ControlPoly4_FirstElement(cp4, sketch)
 
         elif mode == "GridEdge":
             grid = Gui.Selection.getSelection()[0]
             if not SelectedEdge:
                 raise RuntimeError("SelectedEdge was not set in previous code block")
             edge = SelectedEdge
-            a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_GridEdge_000")
-            AN.ControlPoly4_GridEdge(a, grid, edge)
-            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
-            a.ViewObject.LineWidth = 1.00
-            a.ViewObject.LineColor = (0.00, 1.00, 1.00)
-            a.ViewObject.PointSize = 4.00
-            a.ViewObject.PointColor = (0.00, 0.00, 1.00)
-            FreeCAD.ActiveDocument.recompute()
+            cp4 = App.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_GridEdge_000")
+            raise NotImplementedError("ControlPoly4_GridEdge not implemented yet")
+            AN.ControlPoly4_GridEdge(cp4, grid, edge)
 
         elif mode == "2N":
             sketch0 = Gui.Selection.getSelection()[0]
             sketch1 = Gui.Selection.getSelection()[1]
-            a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_2N_000")
-            AN.ControlPoly4_2N(a, sketch0, sketch1)
-            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
-            a.ViewObject.LineWidth = 1.00
-            a.ViewObject.LineColor = (0.00, 1.00, 1.00)
-            a.ViewObject.PointSize = 4.00
-            a.ViewObject.PointColor = (0.00, 0.00, 1.00)
-            FreeCAD.ActiveDocument.recompute()
+            cp4 = App.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_2N_000")
+            AN.ControlPoly4_2N(cp4, sketch0, sketch1)
 
         elif mode == "2P":
             Point0 = Gui.Selection.getSelection()[0]
             Point1 = Gui.Selection.getSelection()[1]
-            a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_2P_000")
-            AN.ControlPoly4_2P(a, Point0, Point1)
-            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
-            a.ViewObject.LineWidth = 1.00
-            a.ViewObject.LineColor = (0.00, 1.00, 1.00)
-            a.ViewObject.PointSize = 4.00
-            a.ViewObject.PointColor = (0.00, 0.00, 1.00)
-            FreeCAD.ActiveDocument.recompute()
+            cp4 = App.ActiveDocument.addObject("Part::FeaturePython", "ControlPoly4_2P_000")
+            AN.ControlPoly4_2P(cp4, Point0, Point1)
 
         else:
             print("Selection not recognized, check tooltip")
+
+        if cp4:
+            cp4.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
+            cp4.ViewObject.LineWidth = 1.00
+            cp4.ViewObject.LineColor = (0.00, 1.00, 1.00)
+            cp4.ViewObject.PointSize = 4.00
+            cp4.ViewObject.PointColor = (0.00, 0.00, 1.00)
+            App.ActiveDocument.recompute()
 
     def GetResources(self):
         return {"Pixmap": iconPath, "MenuText": "ControlPoly4", "ToolTip": tooltip}
