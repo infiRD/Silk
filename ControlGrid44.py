@@ -1,8 +1,8 @@
 #    This file is part of Silk
 #    (c) Edward Mills 2016-2017
 #    edwardvmills@gmail.com
-#	
-#    NURBS Surface modeling tools focused on low degree and seam continuity (FreeCAD Workbench) 
+#
+#    NURBS Surface modeling tools focused on low degree and seam continuity (FreeCAD Workbench)
 #
 #    Silk is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,66 +17,74 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import FreeCAD, Part, math
-from FreeCAD import Base
-from FreeCAD import Gui
+# spellchecker: ignore Arach NURBS pixmap
+
+from __future__ import division  # allows floating point division from integers
+
+import FreeCAD as App
+import FreeCADGui as Gui
+
 import ArachNURBS as AN
-from popup import tipsDialog
 import Silk_tooltips
+from popup import tipsDialog
 
 # get strings
-tooltip = (Silk_tooltips.ControlGrid44_baseTip + Silk_tooltips.standardTipFooter)
-moreInfo = (Silk_tooltips.ControlGrid44_baseTip + Silk_tooltips.ControlGrid44_moreInfo)
+tooltip = Silk_tooltips.ControlGrid44_baseTip + Silk_tooltips.standardTipFooter
+moreInfo = Silk_tooltips.ControlGrid44_baseTip + Silk_tooltips.ControlGrid44_moreInfo
 
-# Locate Workbench Directory
-import os, Silk_dummy
+# Locate Workbench Directory & icon
+import os
+
+import Silk_dummy
+
 path_Silk = os.path.dirname(Silk_dummy.__file__)
-path_Silk_icons =  os.path.join( path_Silk, 'Resources', 'Icons')
-iconPath = path_Silk_icons + '/ControlGrid44.svg'
+path_Silk_icons = os.path.join(path_Silk, "Resources", "Icons")
+iconPath = path_Silk_icons + "/ControlGrid44.svg"
 
-class ControlGrid44():
-	def Activated(self):
-		sel=Gui.Selection.getSelection()
-		if len(sel)==0:
-			tipsDialog("Silk: ControlGrid44", moreInfo)
-			return
-		
-		sel=Gui.Selection.getSelection()
-		if len(sel)==4:
-			mode='4sided'
-		elif len(sel)==3:
-			mode='3sided'
 
-		if mode=='4sided':
-			poly0=Gui.Selection.getSelection()[0]
-			poly1=Gui.Selection.getSelection()[1]
-			poly2=Gui.Selection.getSelection()[2]
-			poly3=Gui.Selection.getSelection()[3]
-			a=FreeCAD.ActiveDocument.addObject("Part::FeaturePython","ControlGrid44_4_000")
-			AN.ControlGrid44_4(a,poly0, poly1, poly2, poly3)
-			a.ViewObject.Proxy=0 # just set it to something different from None (this assignment is needed to run an internal notification)
-			a.ViewObject.LineWidth = 1.00
-			a.ViewObject.LineColor = (0.67,1.00,1.00)
-			a.ViewObject.PointSize = 4.00
-			a.ViewObject.PointColor = (0.00,0.33,1.00)
-			FreeCAD.ActiveDocument.recompute()
+class ControlGrid44:
+    def Activated(self):
+        sel = Gui.Selection.getSelection()
 
-		if mode=='3sided':
-			poly0=Gui.Selection.getSelection()[0]
-			poly1=Gui.Selection.getSelection()[1]
-			poly2=Gui.Selection.getSelection()[2]
-			a=FreeCAD.ActiveDocument.addObject("Part::FeaturePython","ControlGrid44_3_000")
-			a.ViewObject.Proxy=0 # just set it to something different from None (this assignment is needed to run an internal notification)
-			AN.ControlGrid44_3(a,poly0, poly1, poly2)
-			a.ViewObject.LineWidth = 1.00
-			a.ViewObject.LineColor = (0.67,1.00,1.00)
-			a.ViewObject.PointSize = 4.00
-			a.ViewObject.PointColor = (0.00,0.33,1.00)
-			FreeCAD.ActiveDocument.recompute()
+        if len(sel) == 0:
+            tipsDialog("Silk: ControlGrid44", moreInfo)
+            return
 
-	def GetResources(self):
-		return {'Pixmap' : iconPath,
-	  			'MenuText': 'ControlGrid44',
-				'ToolTip': tooltip}
+        sel = Gui.Selection.getSelection()
+        if len(sel) == 4:
+            mode = "4sided"
+        elif len(sel) == 3:
+            mode = "3sided"
 
-Gui.addCommand('ControlGrid44', ControlGrid44())
+        if mode == "4sided":
+            poly0 = Gui.Selection.getSelection()[0]
+            poly1 = Gui.Selection.getSelection()[1]
+            poly2 = Gui.Selection.getSelection()[2]
+            poly3 = Gui.Selection.getSelection()[3]
+            a = App.ActiveDocument.addObject("Part::FeaturePython", "ControlGrid44_4_000")
+            AN.ControlGrid44_4(a, poly0, poly1, poly2, poly3)
+            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
+            a.ViewObject.LineWidth = 1.00
+            a.ViewObject.LineColor = (0.67, 1.00, 1.00)
+            a.ViewObject.PointSize = 4.00
+            a.ViewObject.PointColor = (0.00, 0.33, 1.00)
+            App.ActiveDocument.recompute()
+
+        if mode == "3sided":
+            poly0 = Gui.Selection.getSelection()[0]
+            poly1 = Gui.Selection.getSelection()[1]
+            poly2 = Gui.Selection.getSelection()[2]
+            a = App.ActiveDocument.addObject("Part::FeaturePython", "ControlGrid44_3_000")
+            a.ViewObject.Proxy = 0  # just set it to something different from None (this assignment is needed to run an internal notification)
+            AN.ControlGrid44_3(a, poly0, poly1, poly2)
+            a.ViewObject.LineWidth = 1.00
+            a.ViewObject.LineColor = (0.67, 1.00, 1.00)
+            a.ViewObject.PointSize = 4.00
+            a.ViewObject.PointColor = (0.00, 0.33, 1.00)
+            App.ActiveDocument.recompute()
+
+    def GetResources(self):
+        return {"Pixmap": iconPath, "MenuText": "ControlGrid44", "ToolTip": tooltip}
+
+
+Gui.addCommand("ControlGrid44", ControlGrid44())
