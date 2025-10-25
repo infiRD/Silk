@@ -26,7 +26,7 @@ import FreeCADGui as Gui
 
 import ArachNURBS as AN
 import Silk_tooltips
-from popup import tipsDialog
+from ToolTipWindow import tipsDialog
 
 
 # get strings
