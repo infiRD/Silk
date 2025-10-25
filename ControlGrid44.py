@@ -45,6 +45,7 @@ iconPath = path_Silk_icons + "/ControlGrid44.svg"
 class ControlGrid44:
     def Activated(self):
         sel = Gui.Selection.getSelection()
+        mode = None
 
         if len(sel) == 0:
             tipsDialog("Silk: ControlGrid44", moreInfo)
@@ -70,7 +71,7 @@ class ControlGrid44:
             a.ViewObject.PointColor = (0.00, 0.33, 1.00)
             App.ActiveDocument.recompute()
 
-        if mode == "3sided":
+        elif mode == "3sided":
             poly0 = Gui.Selection.getSelection()[0]
             poly1 = Gui.Selection.getSelection()[1]
             poly2 = Gui.Selection.getSelection()[2]
@@ -82,6 +83,9 @@ class ControlGrid44:
             a.ViewObject.PointSize = 4.00
             a.ViewObject.PointColor = (0.00, 0.33, 1.00)
             App.ActiveDocument.recompute()
+
+        else:
+            print("Selection not recognized, check tooltip")
 
     def GetResources(self):
         return {"Pixmap": iconPath, "MenuText": "ControlGrid44", "ToolTip": tooltip}
